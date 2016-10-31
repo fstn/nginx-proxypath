@@ -35,3 +35,24 @@ server {
         proxy_set_header Connection $connection_upgrade;
     }
 }
+
+
+
+Redirect changing host proto and port
+server {
+    listen         15000;
+    ssl on;
+    ssl_certificate         /etc/nginx/ssl/cert.cer;
+    ssl_certificate_key     /etc/nginx/ssl/key.key;
+    location / {
+        proxy_pass http://dev.peter.school:5000;
+
+          proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host $http_host;
+
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        proxy_redirect default;
+        proxy_redirect ~^(https?://[^:]+):\d+(?<relpath>/.+)$ http://dev.peter.school:5000$relpath;
+    }
+}
